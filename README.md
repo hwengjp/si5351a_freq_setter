@@ -11,10 +11,10 @@ This project provides a Python-based command-line interface for configuring the 
   - 2-channel output: CH0 + CH2
   - Differential output: CH0 + CH1 (or CH2) pair
 - **Differential Output Support**: Enable differential clock output on CH1 or CH2
-- **Spread Spectrum Clocking (SSC)**: Reduce EMI with configurable spread spectrum
+- **Spread Spectrum Clocking (SSC)**: Reduce EMI with configurable frequency spread range
 - **High Precision**: Accurate frequency generation using fractional PLL synthesis (frequency setting error: <0.0001%)
 - **Test Mode**: Built-in parameter calculation verification function
-- **FT232H Support**: Uses Adafruit FT232H for I2C communication
+- **Hardware Support**: Supports both Adafruit FT232H and Silicon Labs CP2112 USB-to-I2C adapters
 
 ## Requirements
 
@@ -23,19 +23,28 @@ This project provides a Python-based command-line interface for configuring the 
 
 ### Hardware
 - SI5351A clock generator chip
-- Adafruit FT232H USB-to-I2C adapter
+- USB-to-I2C adapter (choose one):
+  - **Adafruit FT232H** USB-to-I2C adapter, or
+  - **Silicon Labs CP2112** USB-to-I2C adapter
 - 25MHz crystal oscillator (connected to SI5351A)
 
 ![Breadboard Setup](doc/breadboard.jpg)
-*Breadboard setup showing SI5351A and FT232H connections*
+*Breadboard setup showing SI5351A and USB-to-I2C adapter connections*
 
 ![100 Yen Case](doc/100yen_case.jpg)
 *100 yen case housing for the project*
 
 ### Software Dependencies
+
+#### For FT232H
 ```bash
 pip install --upgrade adafruit-blinka adafruit-platformdetect
 pip install Adafruit_GPIO
+```
+
+#### For CP2112
+```bash
+pip install hidapi
 ```
 
 ## Installation
@@ -47,15 +56,22 @@ pip install Adafruit_GPIO
    ```
 
 2. **Install dependencies**
+   
+   **For FT232H:**
    ```bash
    pip install --upgrade adafruit-blinka adafruit-platformdetect
    pip install Adafruit_GPIO
    ```
+   
+   **For CP2112:**
+   ```bash
+   pip install hidapi
+   ```
 
 3. **Hardware connection**
-   - Connect FT232H SCL to SI5351A SCL
-   - Connect FT232H SDA to SI5351A SDA
-   - Connect FT232H GND to SI5351A GND
+   - Connect USB-to-I2C adapter SCL to SI5351A SCL
+   - Connect USB-to-I2C adapter SDA to SI5351A SDA
+   - Connect USB-to-I2C adapter GND to SI5351A GND
    - Connect 25MHz crystal oscillator to SI5351A
 
 ### Executable (exe) Generation
@@ -68,12 +84,23 @@ You can generate an executable file using PyInstaller:
    ```
 
 2. **Generate exe file**
+   
+   **For FT232H:**
    ```bash
    # Remove generated files
-   pyinstaller si5351a_freq_setter.py --clean
+   pyinstaller si5351a_freq_setter_FT232H.py --clean
 
    # Generate single file exe (including libusb0.dll)
-   pyinstaller si5351a_freq_setter.py --onefile --add-binary "C:\\Windows\\System32\\libusb0.dll;."
+   pyinstaller si5351a_freq_setter_FT232H.py --onefile --add-binary "C:\\Windows\\System32\\libusb0.dll;."
+   ```
+   
+   **For CP2112:**
+   ```bash
+   # Remove generated files
+   pyinstaller si5351a_freq_setter_CP2112.py --clean
+
+   # Generate single file exe
+   pyinstaller si5351a_freq_setter_CP2112.py --onefile
    ```
 
 The generated exe file will be placed in the `dist` folder.
@@ -82,27 +109,52 @@ The generated exe file will be placed in the `dist` folder.
 
 ### Basic Usage
 
+**For FT232H:**
 ```bash
 # 1-channel output (CH0 only, 100MHz)
-python si5351a_freq_setter.py 100
+python si5351a_freq_setter_FT232H.py 100
 
 # 2-channel output (CH0: 100MHz + CH2: 200MHz)
-python si5351a_freq_setter.py 100 200
+python si5351a_freq_setter_FT232H.py 100 200
 
 # Differential output (channel 1) - CH0(100MHz) + CH1(100MHz inverted)
-python si5351a_freq_setter.py 100 -d 1
+python si5351a_freq_setter_FT232H.py 100 -d 1
 
 # Differential output (channel 1) + CH2 independent output - CH0(100MHz) + CH1(100MHz inverted) + CH2(200MHz)
-python si5351a_freq_setter.py 100 200 -d 1
+python si5351a_freq_setter_FT232H.py 100 200 -d 1
 
 # Differential output (channel 2) - CH0(100MHz) + CH2(100MHz inverted)
-python si5351a_freq_setter.py 100 -d 2
+python si5351a_freq_setter_FT232H.py 100 -d 2
 
 # Enable spread spectrum
-python si5351a_freq_setter.py 100 -s
+python si5351a_freq_setter_FT232H.py 100 -s
 
 # Test mode (parameter calculation test)
-python si5351a_freq_setter.py -t 10
+python si5351a_freq_setter_FT232H.py -t 10
+```
+
+**For CP2112:**
+```bash
+# 1-channel output (CH0 only, 100MHz)
+python si5351a_freq_setter_CP2112.py 100
+
+# 2-channel output (CH0: 100MHz + CH2: 200MHz)
+python si5351a_freq_setter_CP2112.py 100 200
+
+# Differential output (channel 1) - CH0(100MHz) + CH1(100MHz inverted)
+python si5351a_freq_setter_CP2112.py 100 -d 1
+
+# Differential output (channel 1) + CH2 independent output - CH0(100MHz) + CH1(100MHz inverted) + CH2(200MHz)
+python si5351a_freq_setter_CP2112.py 100 200 -d 1
+
+# Differential output (channel 2) - CH0(100MHz) + CH2(100MHz inverted)
+python si5351a_freq_setter_CP2112.py 100 -d 2
+
+# Enable spread spectrum
+python si5351a_freq_setter_CP2112.py 100 -s
+
+# Test mode (parameter calculation test)
+python si5351a_freq_setter_CP2112.py -t 10
 ```
 
 ### Channel Configuration
@@ -124,7 +176,7 @@ python si5351a_freq_setter.py -t 10
   - `-d 1`: Output inverted signal of CH0 frequency to CH1
   - `-d 2`: Output inverted signal of CH0 frequency to CH2
 - `-s, --ssc`: Enable spread spectrum clocking
-- `-a, --amp FLOAT`: Spread spectrum amplitude (default: 0.015)
+- `-a, --amp FLOAT`: Spread spectrum amplitude as percentage of frequency spread relative to base frequency (default: 0.015 = 1.5%)
 - `-m, --mode {CENTER,DOWN}`: Spread spectrum mode (default: DOWN)
 - `-t, --test INT`: Run test mode with specified number of iterations
 
@@ -163,7 +215,11 @@ Due to these limitations, the usable frequencies are limited in the range above 
 
 ### Parameter Calculation Test
 ```bash
-python si5351a_freq_setter.py -t 5
+# For FT232H
+python si5351a_freq_setter_FT232H.py -t 5
+
+# For CP2112
+python si5351a_freq_setter_CP2112.py -t 5
 ```
 
 This test runs random tests in the following frequency ranges:
@@ -184,17 +240,40 @@ After test execution, the following information is displayed:
 
 ## Troubleshooting
 
-### Common Issues
+### FT232H Issues
 
 1. **FT232H device not found**
    - Check USB connection
    - Verify that drivers are properly installed
+   - Ensure FT232H is recognized by the system
 
 2. **I2C communication error**
-   - Check wiring connections
+   - Check wiring connections (SCL, SDA, GND)
    - Verify SI5351A power supply
+   - Check for proper pull-up resistors
 
 3. **Frequency setting error**
+   - Check if requested frequency is within range
+   - Check parameter calculation limitations
+
+### CP2112 Issues
+
+1. **CP2112 device not found**
+   - Check USB connection
+   - Verify that CP2112 drivers are installed
+   - Ensure CP2112 is recognized by the system
+
+2. **HID communication error**
+   - Check if CP2112 is properly connected
+   - Verify device permissions
+   - Check for conflicting drivers
+
+3. **I2C communication error**
+   - Check wiring connections (SCL, SDA, GND)
+   - Verify SI5351A power supply
+   - Check for proper pull-up resistors
+
+4. **Frequency setting error**
    - Check if requested frequency is within range
    - Check parameter calculation limitations
 
@@ -318,22 +397,6 @@ This chapter shows the configuration of the main registers of the SI5351A chip. 
 | 0xB7 | XTAL_CL | Reserved[6:0] | Crystal Oscillator Load Capacitance Setting |
 | 0xBB | CLKIN_FANOUT_EN | XO_FANOUT_EN, Reserved, MS_FANOUT_EN, Reserved[3:0] | Fanout Control |
 
-### Register Access Methods
-
-```python
-# Single register read
-value = si5351.single_access_read_i2c(reg=0x2C)
-
-# Single register write
-si5351.single_access_write_i2c(reg=0x2C, regValue=0x0C)
-
-# Multiple register read
-values = si5351.multi_access_read_i2c(reg=0x2A, numRead=8)
-
-# Multiple register write
-si5351.multi_access_write_i2c(reg=0x2A, regValues=[0x00, 0x01, 0x0C, 0x00])
-```
-
 ## License
 
 This project is released under the GNU General Public License v3.0.
@@ -346,3 +409,4 @@ Please report bugs and feature requests on the GitHub Issues page.
 
 - Original SI5351A Python module by Owain Martin
 - FT232H library by Adafruit Industries
+- CP2112 HID library support

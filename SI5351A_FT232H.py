@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SI5351A, python module for the SI5351A clock generator
+"""SI5351A, python module for the SI5351A clock generator(for CP2112)
 
 created January 8, 2023 by Owain Martin
 modified January 14, 2023 by Owain Martin
@@ -27,13 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #import smbus
 import math
-
-try:
-    from micropython import const
-except ImportError:
-    # For regular Python environments, define const as identity function
-    def const(value):
-        return value
 
 from adafruit_bus_device import i2c_device
 
@@ -659,7 +652,7 @@ class SI5351A:
 
         else : # fout > 150
             # For frequencies > 150MHz, use DIVBY4 mode with predefined stable frequencies
-            # Available stable frequencies for DIVBY4 mode (PLL倍率が偶数整数の場合のみ)
+            # Available stable frequencies for DIVBY4 mode (only when PLL multiplier is even integer)
             stable_frequencies = [150.0, 162.5, 175.0, 187.5, 200.0]
             
             # Find the closest stable frequency

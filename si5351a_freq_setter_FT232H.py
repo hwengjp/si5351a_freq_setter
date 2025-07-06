@@ -35,7 +35,7 @@ class Colors:
     UNDERLINE = '\033[4m'   # Underlined text
     RESET = '\033[0m'       # Reset to default color
 try:
-    import SI5351A
+    import SI5351A_FT232H
 except RuntimeError as e:
     if "FT232H device found" in str(e):
         print("Error: FT232H device not found. Please check your USB connection.")
@@ -68,7 +68,7 @@ def main():
 
     # Initialize SI5351A device
     try:
-        clockGen = SI5351A.SI5351A(0x60, debug_mode=False)
+        clockGen = SI5351A_FT232H.SI5351A(0x60, debug_mode=False)
     except Exception as e:
         print(f"Error: Failed to initialize SI5351A device: {e}")
         print("Please check the device connection and I2C address.")

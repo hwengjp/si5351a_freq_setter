@@ -9,10 +9,10 @@
   - 2チャネル出力: CH0 + CH2
   - ディファレンシャル出力: CH0 + CH1（またはCH2）のペア
 - **ディファレンシャル出力対応**: CH1または2でディファレンシャルクロック出力を有効化
-- **スプレッドスペクトラムクロッキング（SSC）**: 設定可能なスプレッドスペクトラムでEMIを低減
+- **スプレッドスペクトラムクロッキング（SSC）**: 設定可能な周波数拡散範囲
 - **高精度**: 分数PLL合成による正確な周波数生成（周波数設定誤差: 0.0001%未満）
 - **テストモード**: 内蔵パラメータ計算検証機能
-- **FT232H対応**: I2C通信にAdafruit FT232Hを使用
+- **複数ハードウェア対応**: FT232HまたはCP2112を使用したI2C通信
 
 ## 必要条件
 
@@ -21,19 +21,28 @@
 
 ### ハードウェア
 - SI5351Aクロックジェネレータチップ
-- Adafruit FT232H USB-to-I2Cアダプタ
+- **I2C-USB変換器**（以下のいずれか）:
+  - Adafruit FT232H USB-to-I2Cアダプタ
+  - Silicon Labs CP2112 USB-to-I2Cアダプタ
 - 25MHz水晶発振器（SI5351Aに接続）
 
 ![ブレッドボードセットアップ](doc/breadboard.jpg)
-*SI5351AとFT232Hの接続を示すブレッドボードセットアップ*
+*SI5351AとI2C-USB変換器の接続を示すブレッドボードセットアップ*
 
 ![100円ケース](doc/100yen_case.jpg)
 *プロジェクト用の100円ケース*
 
 ### ソフトウェア依存関係
+
+#### FT232H使用時
 ```bash
 pip install --upgrade adafruit-blinka adafruit-platformdetect
 pip install Adafruit_GPIO
+```
+
+#### CP2112使用時
+```bash
+pip install hidapi
 ```
 
 ## インストール
@@ -45,15 +54,20 @@ pip install Adafruit_GPIO
    ```
 
 2. **依存関係をインストール**
-   ```bash
-   pip install --upgrade adafruit-blinka adafruit-platformdetect
-   pip install Adafruit_GPIO
-   ```
+   - **FT232H使用時**:
+     ```bash
+     pip install --upgrade adafruit-blinka adafruit-platformdetect
+     pip install Adafruit_GPIO
+     ```
+   - **CP2112使用時**:
+     ```bash
+     pip install hidapi
+     ```
 
 3. **ハードウェア接続**
-   - FT232HのSCLをSI5351AのSCLに接続
-   - FT232HのSDAをSI5351AのSDAに接続
-   - FT232HのGNDをSI5351AのGNDに接続
+   - I2C-USB変換器のSCLをSI5351AのSCLに接続
+   - I2C-USB変換器のSDAをSI5351AのSDAに接続
+   - I2C-USB変換器のGNDをSI5351AのGNDに接続
    - 25MHz水晶発振器をSI5351Aに接続
 
 ### 実行ファイル（exe）の生成
@@ -67,40 +81,56 @@ PyInstallerを使用して実行ファイルを生成できます：
 
 2. **exeファイルを生成**
    ```bash
-   # 生成済みファイルの削除
-   pyinstaller si5351a_freq_setter.py --clean
-
-   # 単一ファイルexe生成（libusb0.dllを含む）
-   pyinstaller si5351a_freq_setter.py --onefile --add-binary "C:\\Windows\\System32\\libusb0.dll;."
+   # FT232H版
+   pyinstaller si5351a_freq_setter_FT232H.py --clean
+   pyinstaller si5351a_freq_setter_FT232H.py --onefile --add-binary "C:\\Windows\\System32\\libusb0.dll;."
+   
+   # CP2112版
+   pyinstaller si5351a_freq_setter_CP2112.py --clean
+   pyinstaller si5351a_freq_setter_CP2112.py --onefile
    ```
 
 生成されたexeファイルは`dist`フォルダに配置されます。
 
 ## 使用方法
 
+### ハードウェア選択
+
+使用するI2C-USB変換器に応じて、適切なプログラムを選択してください：
+
+- **FT232H使用時**: `si5351a_freq_setter_FT232H.py`
+- **CP2112使用時**: `si5351a_freq_setter_CP2112.py`
+
 ### 基本的な使用方法
 
 ```bash
 # 1チャネル出力（CH0のみ、100MHz）
-python si5351a_freq_setter.py 100
+python si5351a_freq_setter_FT232H.py 100    # FT232H使用時
+python si5351a_freq_setter_CP2112.py 100    # CP2112使用時
 
 # 2チャネル出力（CH0: 100MHz + CH2: 200MHz）
-python si5351a_freq_setter.py 100 200
+python si5351a_freq_setter_FT232H.py 100 200
+python si5351a_freq_setter_CP2112.py 100 200
 
 # ディファレンシャル出力（チャネル1）- CH0(100MHz) + CH1(100MHz反転)
-python si5351a_freq_setter.py 100 -d 1
+python si5351a_freq_setter_FT232H.py 100 -d 1
+python si5351a_freq_setter_CP2112.py 100 -d 1
 
 # ディファレンシャル出力（チャネル1）+ CH2独立出力 - CH0(100MHz) + CH1(100MHz反転) + CH2(200MHz)
-python si5351a_freq_setter.py 100 200 -d 1
+python si5351a_freq_setter_FT232H.py 100 200 -d 1
+python si5351a_freq_setter_CP2112.py 100 200 -d 1
 
 # ディファレンシャル出力（チャネル2）- CH0(100MHz) + CH2(100MHz反転)
-python si5351a_freq_setter.py 100 -d 2
+python si5351a_freq_setter_FT232H.py 100 -d 2
+python si5351a_freq_setter_CP2112.py 100 -d 2
 
 # スプレッドスペクトラム有効
-python si5351a_freq_setter.py 100 -s
+python si5351a_freq_setter_FT232H.py 100 -s
+python si5351a_freq_setter_CP2112.py 100 -s
 
 # テストモード（パラメータ計算テスト）
-python si5351a_freq_setter.py -t 10
+python si5351a_freq_setter_FT232H.py -t 10
+python si5351a_freq_setter_CP2112.py -t 10
 ```
 
 ### チャネル構成
@@ -122,7 +152,7 @@ python si5351a_freq_setter.py -t 10
   - `-d 1`: CH1にCH0と同じ周波数の反転信号を出力
   - `-d 2`: CH2にCH0と同じ周波数の反転信号を出力
 - `-s, --ssc`: スプレッドスペクトラムクロッキングを有効化
-- `-a, --amp FLOAT`: スプレッドスペクトラム振幅（デフォルト: 0.015）
+- `-a, --amp FLOAT`: 基本周波数に対する周波数拡散のパーセンテージ（デフォルト: 0.015 = 1.5%）
 - `-m, --mode {CENTER,DOWN}`: スプレッドスペクトラムモード（デフォルト: DOWN）
 - `-t, --test INT`: テストモードで指定回数のイテレーションを実行
 
@@ -161,7 +191,8 @@ python si5351a_freq_setter.py -t 10
 
 ### パラメータ計算テスト
 ```bash
-python si5351a_freq_setter.py -t 5
+python si5351a_freq_setter_FT232H.py -t 5    # FT232H使用時
+python si5351a_freq_setter_CP2112.py -t 5    # CP2112使用時
 ```
 
 このテストは以下の周波数範囲でランダムテストを実行します：
@@ -184,17 +215,30 @@ python si5351a_freq_setter.py -t 5
 
 ### よくある問題
 
-1. **FT232Hデバイスが見つからない**
+1. **I2C-USB変換器デバイスが見つからない**
    - USB接続を確認
    - ドライバーが正しくインストールされているか確認
+   - **FT232H**: Adafruit Blinkaライブラリがインストールされているか確認
+   - **CP2112**: hidapiライブラリがインストールされているか確認
 
 2. **I2C通信エラー**
    - 配線接続を確認
    - SI5351Aの電源供給を確認
+   - I2Cアドレス（0x60）が正しいか確認
 
 3. **周波数設定エラー**
    - 要求周波数が範囲内か確認
    - パラメータ計算の制限を確認
+
+### ハードウェア固有の問題
+
+#### FT232H使用時
+- **libusb0.dllエラー**: システムにlibusb0.dllがインストールされているか確認
+- **権限エラー**: 管理者権限で実行を試行
+
+#### CP2112使用時
+- **HIDデバイス認識エラー**: CP2112ドライバーが正しくインストールされているか確認
+- **VID/PIDエラー**: デバイスが0x10C4/0xEA90で認識されているか確認
 
 ## SI5351A レジスタマップ仕様
 
@@ -315,22 +359,6 @@ python si5351a_freq_setter.py -t 5
 | 0xB1 | PLLB_RST | Reserved, PLLA_RST, Reserved[4:0] | PLL リセット制御 |
 | 0xB7 | XTAL_CL | Reserved[6:0] | 水晶発振器負荷容量設定 |
 | 0xBB | CLKIN_FANOUT_EN | XO_FANOUT_EN, Reserved, MS_FANOUT_EN, Reserved[3:0] | ファンアウト制御 |
-
-### レジスタアクセス方法
-
-```python
-# 単一レジスタ読み込み
-value = si5351.single_access_read_i2c(reg=0x2C)
-
-# 単一レジスタ書き込み  
-si5351.single_access_write_i2c(reg=0x2C, regValue=0x0C)
-
-# 複数レジスタ読み込み
-values = si5351.multi_access_read_i2c(reg=0x2A, numRead=8)
-
-# 複数レジスタ書き込み
-si5351.multi_access_write_i2c(reg=0x2A, regValues=[0x00, 0x01, 0x0C, 0x00])
-```
 
 ## ライセンス
 
