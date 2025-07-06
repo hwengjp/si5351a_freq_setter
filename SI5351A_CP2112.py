@@ -40,7 +40,7 @@ class HIDDriver:
         print("Product: %s" % h.get_product_string())
         print("Serial No: %s" % h.get_serial_number_string())
 
-        # Set wait times (NORMAL mode fixed)
+        # Set wait times
         self.write_delay = 0.00001  # 0.01ms (recommended value when delay is inserted: 3ms)
         self.read_delay =  0.00001  # 0.01ms (recommended value when delay is inserted: 0.5ms)
 
@@ -52,8 +52,8 @@ class HIDDriver:
         # Set gpio
         self.h.send_feature_report([0x02, self.gpio_direction, self.gpio_pushpull, self.gpio_special, self.gpio_clockdiv])
 
-        # I2C speed setting (NORMAL mode fixed: approximately 400kHz)
-        print("Set SMB Configuration - NORMAL Mode (400kHz)")
+        # I2C speed setting (400kHz)
+        print("Set SMB Configuration - 400kHz")
         self.h.send_feature_report([0x06, 0x00, 0x01, 0x86, 0xA0, 0x02, 0x00, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0x00, 0x0F])
 
     def I2CError(self):
