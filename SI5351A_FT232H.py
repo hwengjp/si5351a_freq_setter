@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SI5351A, python module for the SI5351A clock generator(for CP2112)
+"""SI5351A, python module for the SI5351A clock generator for FT232H
 
 created January 8, 2023 by Owain Martin
 modified January 14, 2023 by Owain Martin

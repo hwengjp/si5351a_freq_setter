@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SI5351A Clock Generator Frequency Setter (CP2112版 - 完全版)
+SI5351A Clock Generator Frequency Setter for CP2112
 
 Command-line interface for configuring SI5351A clock generator chip
 
@@ -49,7 +49,7 @@ def main():
     # Main function for SI5351A clock generator configuration
 
     # Configure ArgumentParser for command line interface
-    parser = argparse.ArgumentParser(description='SI5351A clock generator frequency setter (CP2112版 - 完全版)')
+    parser = argparse.ArgumentParser(description='SI5351A clock generator frequency setter for CP2112')
     parser.add_argument('--differential', '-d', type=int, choices=[1, 2], metavar='CHANNEL',
                        help='Enable differential output on specified channel (1 or 2)')
     parser.add_argument('--ssc', '-s', action='store_true', help='Enable Spread Spectrum Clocking')

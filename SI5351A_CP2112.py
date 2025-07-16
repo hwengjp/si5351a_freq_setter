@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""SI5351A, Python module for SI5351A clock generator (CP2112 version)
+"""SI5351A, Python module for SI5351A clock generator for CP2112
 
 Created by Owain Martin on January 8, 2023
 Modified by Owain Martin on January 14, 2023
 calculate_parameters method and test_calculate_parameters method added by Kenji Ikeda on June 21, 2025
-FT232H support added by Kenji Ikeda on June 21, 2025
 CP2112 support added by Kenji Ikeda on July 6, 2025
 """
 
