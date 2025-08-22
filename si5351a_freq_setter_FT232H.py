@@ -4,12 +4,12 @@ SI5351A Clock Generator Frequency Setter for FT232H
 
 Command-line interface for configuring SI5351A clock generator chip
 
-created December 19, 2024 by Kenji Ikeda
+created December 19, 2024 by hwengjp
 Based on SI5351A Python module by Owain Martin (created January 8, 2023)
 """
 
 """
-Copyright 2024 Kenji Ikeda
+Copyright 2024 hwengjp
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License v3.0.

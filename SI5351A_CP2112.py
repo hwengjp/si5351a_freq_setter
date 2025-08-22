@@ -3,13 +3,13 @@
 
 Created by Owain Martin on January 8, 2023
 Modified by Owain Martin on January 14, 2023
-calculate_parameters method and test_calculate_parameters method added by Kenji Ikeda on June 21, 2025
-CP2112 support added by Kenji Ikeda on July 6, 2025
+calculate_parameters method and test_calculate_parameters method added by hwengjp on June 21, 2025
+CP2112 support added by hwengjp on July 6, 2025
 """
 
 """
 Copyright 2023 Owain Martin
-Copyright 2025 Kenji Ikeda
+Copyright 2025 hwengjp
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ class HIDDriver:
         print("Serial No: %s" % h.get_serial_number_string())
 
         # Set wait times
-        self.write_delay = 0.00001  # 0.01ms (recommended value when delay is inserted: 3ms)
-        self.read_delay =  0.00001  # 0.01ms (recommended value when delay is inserted: 0.5ms)
+        self.write_delay = 0.001  # 1ms (increased from 0.01ms)
+        self.read_delay =  0.001  # 1ms (increased from 0.01ms)
 
         self.gpio_direction = 0x00
         self.gpio_pushpull  = 0x00

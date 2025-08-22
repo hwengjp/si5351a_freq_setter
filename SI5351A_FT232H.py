@@ -3,13 +3,13 @@
 
 created January 8, 2023 by Owain Martin
 modified January 14, 2023 by Owain Martin
-calculate_parameters method and test_calculate_parameters method added by Kenji Ikeda on June 21, 2025
-FT232H support added by Kenji Ikeda on June 21, 2025
+calculate_parameters method and test_calculate_parameters method added by hwengjp on June 21, 2025
+FT232H support added by hwengjp on June 21, 2025
 """
 
 """
 Copyright 2023 Owain Martin
-Copyright 2025 Kenji Ikeda
+Copyright 2025 hwengjp
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
