@@ -551,13 +551,16 @@ class SI5351A:
         # Set spread spectrum registers
         xtalF = self.xtal
 
+        # Convert sscAMP to effective amplitude (half of specified value for p-p)
+        effective_sscAMP = sscAMP / 2.0
+
         # Up/down parameters
         # SSUDP[11:0] = Floor(xtalF/4x31500)
         SSUDP = math.floor(xtalF/(4*31500))
         SSUDP_bytes = self.s_byte_separation(SSUDP)
 
-        SSUP = 128*pllARatio*(sscAMP/((1-sscAMP)*SSUDP))
-        SSDN = 128*pllARatio*(sscAMP/((1+sscAMP)*SSUDP))
+        SSUP = 128*pllARatio*(effective_sscAMP/((1-effective_sscAMP)*SSUDP))
+        SSDN = 128*pllARatio*(effective_sscAMP/((1+effective_sscAMP)*SSUDP))
 
         # Down spread parameters
         # SSDN_P1[11:0] = Floor(SSDN)

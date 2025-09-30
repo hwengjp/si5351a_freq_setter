@@ -176,7 +176,7 @@ python si5351a_freq_setter_CP2112.py -t 10
   - `-d 1`: Output inverted signal of CH0 frequency to CH1
   - `-d 2`: Output inverted signal of CH0 frequency to CH2
 - `-s, --ssc`: Enable spread spectrum clocking
-- `-a, --amp FLOAT`: Spread spectrum amplitude as percentage of frequency spread relative to base frequency (default: 0.015 = 1.5%)
+- `-a, --amp FLOAT`: Spread spectrum amplitude as percentage of frequency spread relative to base frequency (default: 0.015 = 1.5% p-p)
 - `-m, --mode {CENTER,DOWN}`: Spread spectrum mode (default: DOWN)
 - `-t, --test INT`: Run test mode with specified number of iterations
 
