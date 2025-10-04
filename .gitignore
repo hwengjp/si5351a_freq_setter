@@ -67,4 +67,4 @@ ehthumbs.db
 Thumbs.db
 
 # Executable files
-*.exe 
+#*.exe 
